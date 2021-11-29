@@ -99,8 +99,6 @@ double DFunc(complex<double> x, bool per1, int number_roots = 0, complex<double>
     double f;
     double x1 = x.real();
     double y1 = x.imag();
-    //if (per1) x1= complex<double>(x.real(),0.);
-    //else x1 = complex<double>(0., x.imag());
     if (!per1) {
         if (number_roots == 0)
             f = 2 * (-120 * pow(x1, 4) + 3 * pow(x1, 5) + 2 * pow(x1, 3) * (1165 - 50 * y1 + 3 * pow(y1, 2)) - 18 * pow(x1, 2) * (1443 - 138 * y1 + 8 * pow(y1, 2)) + x1 * (165240 - 27252 * y1 + 2402 * pow(y1, 2) - 100 * pow(y1, 3) + 3 * pow(y1, 4)) - 6 * (78300 - 19140 * y1 + 2283 * pow(y1, 2) - 138 * pow(y1, 3) + 4 * pow(y1, 4)));
@@ -223,7 +221,7 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
     return xn;
 }
 
-complex<double> GradWithConst(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
     complex<double>x = complex<double>(A, A);
@@ -232,17 +230,19 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
     //double a = 0.0001*pow(10,number_roots);
 
     double delta = 0.01;
-    double a = min((1 - eps) / (L), 0.1);
-    out << "GradWithConst(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
+    double a = 1 / sqrt(i+1.);
+    out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
     complex<double>xn = start;
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
     while (abs(grad) >= delta) {
 
         out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
-        xn -= a * grad;
+        
+        xn -= a * grad/ double(abs(grad));
         grad = Grad(xn, number_roots, first_root, second_root);
         i++;
+        a = 1 / sqrt(i+1.);
     }
     out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
     out << " /0 ";
@@ -272,6 +272,10 @@ int main() {
     first_root = GradWithConst(complex<double>(12., 12.), 0);
     second_root = GradWithConst(first_root, 1, first_root);
    GradWithConst(second_root, 2, first_root, second_root);
+
+   first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
+   second_root = GradWithKnownStep(first_root, 1, first_root);
+   GradWithKnownStep(second_root, 2, first_root, second_root);
 
 
 	return 0;
