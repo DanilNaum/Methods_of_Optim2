@@ -254,6 +254,38 @@ complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, c
     return xn;
 }
 
+complex<double> GradWithCrushingStep(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
+    complex<double>x = complex<double>(A, A);
+    complex<double>y = complex<double>(B, B);
+    double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root)) / abs(x - y);
+    double a = 1.;
+
+    double delta = 0.01;
+   // double a = 1 / sqrt(i + 1.);
+    out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
+
+    complex<double>xn = start;
+    complex<double>grad = Grad(xn, number_roots, first_root, second_root);
+    while (abs(grad) >= delta) {
+
+        out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
+
+        xn -= a * grad / double(abs(grad));
+        grad = Grad(xn, number_roots, first_root, second_root);
+        i++;
+        a = 1 / sqrt(i + 1.);
+    }
+    out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
+    out << " /0 ";
+    out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(4);
+    return xn;
+}
 
 void clear_out(string file) {
     ofstream out(file);
