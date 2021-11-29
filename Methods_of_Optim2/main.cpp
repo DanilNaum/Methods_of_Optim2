@@ -191,6 +191,7 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
     return xn;
 }
 
+
 complex<double> GradWithConst(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
