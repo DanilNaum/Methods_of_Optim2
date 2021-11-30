@@ -237,7 +237,7 @@ complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, c
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
     while (abs(grad) >= delta) {
 
-        out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
+        out << i << " " << xn << " " << grad << " " << double(abs(grad)) << " " << endl;
         
         xn -= a * grad/ double(abs(grad));
         grad = Grad(xn, number_roots, first_root, second_root);
@@ -257,25 +257,30 @@ complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, c
 complex<double> GradWithCrushingStep(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
+    
     complex<double>x = complex<double>(A, A);
     complex<double>y = complex<double>(B, B);
     double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root)) / abs(x - y);
-    double a = 1.;
+    double a = 1, grad_abs, f_prew, f_xn;
 
     double delta = 0.01;
    // double a = 1 / sqrt(i + 1.);
-    out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
+    out << "GradWithCrushingStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
-    complex<double>xn = start;
+    complex<double>xn = start, prew;
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
+    f_xn = Func(xn, number_roots, first_root, second_root);
     while (abs(grad) >= delta) {
-
-        out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
-
+        grad_abs = double(abs(grad));
+        out << i << " " << xn << " " << grad << " " << grad_abs << endl;
+        prew = xn;
         xn -= a * grad / double(abs(grad));
         grad = Grad(xn, number_roots, first_root, second_root);
         i++;
-        a = 1 / sqrt(i + 1.);
+        f_prew = f_xn;
+        f_xn = Func(xn, number_roots, first_root, second_root);
+        if (((f_prew - f_xn) <= -a * 0.9 * pow(grad_abs, 2)));
+        else   a = a * 0.9;
     }
     out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
     out << " /0 ";
@@ -308,6 +313,11 @@ int main() {
    first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
    second_root = GradWithKnownStep(first_root, 1, first_root);
    GradWithKnownStep(second_root, 2, first_root, second_root);
+
+
+   first_root = GradWithCrushingStep(complex<double>(12., 12.), 0);
+   second_root = GradWithCrushingStep(first_root, 1, first_root);
+   GradWithCrushingStep(second_root, 2, first_root, second_root);
 
 
 	return 0;
