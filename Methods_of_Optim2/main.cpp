@@ -162,6 +162,58 @@ double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> fi
 }
 
 complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    double step = 0.9;
+    complex<double> p_xn = start;
+    double Prew = Func(start, number_roots, first_root, second_root);
+    
+
+    complex<double> xn = p_xn + complex<double>(step,0.);
+    double Curr = Func(xn, number_roots, first_root, second_root);
+    
+    while (abs(Curr - Prew) > eps) {
+        if (Prew < Curr) {
+            step = -step;
+            while (Prew < Curr) {
+                p_xn = xn;
+                Prew = Curr;
+                xn = p_xn + complex<double>(step, 0.);
+                Curr = Func(xn, number_roots, first_root, second_root);
+            }
+        }
+        while (Prew > Curr) {
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(step, 0.);
+            Curr = Func(xn, number_roots, first_root, second_root);
+        }
+        xn = p_xn + complex<double>(0., step);
+        Curr = Func(xn, number_roots, first_root, second_root);
+        if (Prew < Curr) {
+            step = -step;
+            while (Prew < Curr) {
+                p_xn = xn;
+                Prew = Curr;
+                xn = p_xn + complex<double>(0., step);
+                Curr = Func(xn, number_roots, first_root, second_root);
+            }
+        }
+        while (Prew > Curr) {
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(0., step);
+            Curr = Func(xn, number_roots, first_root, second_root);
+        }
+        xn = p_xn + complex<double>(step, 0.);
+        Curr = Func(xn, number_roots, first_root, second_root);
+        step /= 2;
+    }
+    cout << p_xn;
+    return (p_xn);
+}
+
+
+
+complex<double> PoKordin2(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
     out << "PoKordin"<< number_roots+1 << "\n" << " " << "i" << " " << "(x,y)" << " " << "F(x,y)" << endl;
@@ -302,7 +354,7 @@ int main() {
     clear_out("ans.txt");
     clear_out("tmptable.txt");
     complex<double> first_root = PoKordin(complex<double>(0.,0.),0);
-    complex<double> second_root = PoKordin(complex<double>(0., 0.), 1, first_root);
+    complex<double> second_root = PoKordin(first_root, 1, first_root);
     PoKordin(second_root, 2, first_root, second_root);
 
     
