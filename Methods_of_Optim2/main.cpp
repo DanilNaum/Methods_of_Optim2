@@ -7,7 +7,7 @@
 
 
 double Eps = 1e-5;
-double eps = 1 / 2;
+double eps = 1. / 2.;
 using namespace std;
 int coun = 0;
 double A = 0.;
@@ -173,19 +173,19 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
     complex<double> xn = p_xn + complex<double>(step,0.);
     double Curr = Func(xn, number_roots, first_root, second_root);
     out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
-    while (abs(Curr - Prew) > eps) {
+    while (abs(Curr - Prew) >eps) {
         xn = p_xn + complex<double>(step, 0.);
         Curr = Func(xn, number_roots, first_root, second_root);
         if (Prew < Curr) {
             step = -step;
-            while (Prew < Curr) {
-                p_xn = xn;
-                Prew = Curr;
-                xn = p_xn + complex<double>(step, 0.);
-                Curr = Func(xn, number_roots, first_root, second_root);
-                i++;
-                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
-            }
+
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(step, 0.);
+            Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+
         }
 
         while (Prew > Curr) {
@@ -200,14 +200,12 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
         Curr = Func(xn, number_roots, first_root, second_root);
         if (Prew < Curr) {
             step = -step;
-            while (Prew < Curr) {
-                p_xn = xn;
-                Prew = Curr;
-                xn = p_xn + complex<double>(0., step);
-                Curr = Func(xn, number_roots, first_root, second_root);
-                i++;
-                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
-            }
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(0., step);
+            Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
         }
         while (Prew > Curr) {
             p_xn = xn;
@@ -267,11 +265,12 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
     ofstream out("tmptable.txt", ios_base::app);
    complex<double>x = complex<double>(A, A);
     complex<double>y = complex<double>(B, B);
-    double L = abs(Grad(x, number_roots, first_root, second_root)- Grad(y, number_roots, first_root, second_root))/abs(x-y);
-    //double a = 0.0001*pow(10,number_roots);
+    double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y);
+    double a = 0.0001*pow(10,number_roots);
     
     double delta = 0.01;
-    double a = min((1 - eps) / (L),0.1);
+    //double a = min((1 - eps) / (L),0.1);
+    
     out << "GradWithConst(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
     complex<double>xn = start;
