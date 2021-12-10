@@ -162,6 +162,9 @@ double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> fi
 }
 
 complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
+    out << "PoKordin" << "\n" << " " << "i" << " " << "Step" << " " << "(x,y)" << " " << "F(x,y)" << " " << "(x,y)_prew" << " " << "F_prew(x,y)" << endl;
     double step = 0.9;
     complex<double> p_xn = start;
     double Prew = Func(start, number_roots, first_root, second_root);
@@ -169,8 +172,10 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
 
     complex<double> xn = p_xn + complex<double>(step,0.);
     double Curr = Func(xn, number_roots, first_root, second_root);
-    
+    out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
     while (abs(Curr - Prew) > eps) {
+        xn = p_xn + complex<double>(step, 0.);
+        Curr = Func(xn, number_roots, first_root, second_root);
         if (Prew < Curr) {
             step = -step;
             while (Prew < Curr) {
@@ -178,13 +183,18 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
                 Prew = Curr;
                 xn = p_xn + complex<double>(step, 0.);
                 Curr = Func(xn, number_roots, first_root, second_root);
+                i++;
+                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
             }
         }
+
         while (Prew > Curr) {
             p_xn = xn;
             Prew = Curr;
             xn = p_xn + complex<double>(step, 0.);
             Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
         }
         xn = p_xn + complex<double>(0., step);
         Curr = Func(xn, number_roots, first_root, second_root);
@@ -195,6 +205,8 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
                 Prew = Curr;
                 xn = p_xn + complex<double>(0., step);
                 Curr = Func(xn, number_roots, first_root, second_root);
+                i++;
+                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
             }
         }
         while (Prew > Curr) {
@@ -202,13 +214,21 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
             Prew = Curr;
             xn = p_xn + complex<double>(0., step);
             Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
         }
-        xn = p_xn + complex<double>(step, 0.);
-        Curr = Func(xn, number_roots, first_root, second_root);
+        
         step /= 2;
     }
-    cout << p_xn;
+    
+    out << " /0 ";
+    out << "Root at the point: " << xn << " Func value: " << " " << Curr << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(6);
     return (p_xn);
+    
 }
 
 
