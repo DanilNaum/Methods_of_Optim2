@@ -89,34 +89,32 @@ double DFunc(complex<double> x, bool per1, int number_roots = 0, complex<double>
     complex<double>B = complex<double>(12.0, 6.0);
     complex<double>C = complex<double>(6.0, 7.0);
     complex<double>D = first_root;
-    double dx = (D - A - B - C).real();
-    double dy = (D - A - B - C).imag();
-    double ddx = (D * D - A * D - B * D - C * D + A * B + A * C + B * C).real();
-    double ddy = (D * D - A * D - B * D - C * D + A * B + A * C + B * C).imag();
+    double n_r1cof_b_real = (D - A - B - C).real();
+    double n_r1cof_b_imag = (D - A - B - C).imag();
+    double n_r1cof_c_real = (D * D - A * D - B * D - C * D + A * B + A * C + B * C).real();
+    double n_r1cof_c_imag = (D * D - A * D - B * D - C * D + A * B + A * C + B * C).imag();
     complex<double>E = second_root;
-    double Ex = (E + D - A - B - C).real();
-    double Ey = (E + D - A - B - C).imag();
+    double n_r2cof_b_real = (E + D - A - B - C).real();
+    double n_r2cof_b_imag = (E + D - A - B - C).imag();
     double f;
     double x1 = x.real();
     double y1 = x.imag();
-    //if (per1) x1= complex<double>(x.real(),0.);
-    //else x1 = complex<double>(0., x.imag());
     if (!per1) {
         if (number_roots == 0)
             f = 2 * (-120 * pow(x1, 4) + 3 * pow(x1, 5) + 2 * pow(x1, 3) * (1165 - 50 * y1 + 3 * pow(y1, 2)) - 18 * pow(x1, 2) * (1443 - 138 * y1 + 8 * pow(y1, 2)) + x1 * (165240 - 27252 * y1 + 2402 * pow(y1, 2) - 100 * pow(y1, 3) + 3 * pow(y1, 4)) - 6 * (78300 - 19140 * y1 + 2283 * pow(y1, 2) - 138 * pow(y1, 3) + 4 * pow(y1, 4)));
         else if (number_roots == 1)
-            f = 2 * (pow(dx, 2) * x1 + pow(dy, 2) * x1 + 3 * dx * pow(x1, 2) + 2 * pow(x1, 3) + ddx * (dx + 2 * x1) + 2 * dy * x1 * y1 + (dx + 2 * x1) * pow(y1, 2) + ddy * (dy + 2 * y1));
+            f = 2 * (pow(n_r1cof_b_real, 2) * x1 + pow(n_r1cof_b_imag, 2) * x1 + 3 * n_r1cof_b_real * pow(x1, 2) + 2 * pow(x1, 3) + n_r1cof_c_real * (n_r1cof_b_real + 2 * x1) + 2 * n_r1cof_b_imag * x1 * y1 + (n_r1cof_b_real + 2 * x1) * pow(y1, 2) + n_r1cof_c_imag * (n_r1cof_b_imag + 2 * y1));
         else
-            f = 2*(Ex + x1);
+            f = 2*(n_r2cof_b_real + x1);
         return (f);
     }
     else {
         if (number_roots == 0) 
             f = 2 * (-502200 + pow(x1, 3) * (828 - 96 * y1) + 178200 * y1 - 27918 * pow(y1, 2) + 2474 * pow(y1, 3) - 125 * pow(y1, 4) + 3 * pow(y1, 5) + pow(x1, 4) * (-25 + 3 * y1) + 2 * pow(x1, 2) * (-6813 + 1201 * y1 - 75 * pow(y1, 2) + 3 * pow(y1, 3)) - 12 * x1 * (-9570 + 2283 * y1 - 207 * pow(y1, 2) + 8 * pow(y1, 3)));
         else if (number_roots == 1)
-            f = 2 * (dy * pow(x1, 2) + ddy * (dx + 2 * x1) + pow(dx, 2) * y1 + pow(dy, 2) * y1 + 2 * dx * x1 * y1 + 2 * pow(x1, 2) * y1 + 3 * dy * pow(y1, 2) + 2 * pow(y1, 3) - ddx * (dy + 2 * y1));
+            f = 2 * (n_r1cof_b_imag * pow(x1, 2) + n_r1cof_c_imag * (n_r1cof_b_real + 2 * x1) + pow(n_r1cof_b_real, 2) * y1 + pow(n_r1cof_b_imag, 2) * y1 + 2 * n_r1cof_b_real * x1 * y1 + 2 * pow(x1, 2) * y1 + 3 * n_r1cof_b_imag * pow(y1, 2) + 2 * pow(y1, 3) - n_r1cof_c_real * (n_r1cof_b_imag + 2 * y1));
         else
-            f =  2 *(Ey+y1);
+            f =  2 *(n_r2cof_b_imag+y1);
         
         return (f);
     }
@@ -166,8 +164,80 @@ double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> fi
 complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
+    out << "PoKordin" << "\n" << " " << "i" << " " << "Step" << " " << "(x,y)" << " " << "F(x,y)" << " " << "(x,y)_prew" << " " << "F_prew(x,y)" << endl;
+    double step = 0.9;
+    complex<double> p_xn = start;
+    double Prew = Func(start, number_roots, first_root, second_root);
+    
+
+    complex<double> xn = p_xn + complex<double>(step,0.);
+    double Curr = Func(xn, number_roots, first_root, second_root);
+    out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+    while (abs(Curr - Prew) > eps) {
+        xn = p_xn + complex<double>(step, 0.);
+        Curr = Func(xn, number_roots, first_root, second_root);
+        if (Prew < Curr) {
+            step = -step;
+            while (Prew < Curr) {
+                p_xn = xn;
+                Prew = Curr;
+                xn = p_xn + complex<double>(step, 0.);
+                Curr = Func(xn, number_roots, first_root, second_root);
+                i++;
+                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+            }
+        }
+
+        while (Prew > Curr) {
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(step, 0.);
+            Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+        }
+        xn = p_xn + complex<double>(0., step);
+        Curr = Func(xn, number_roots, first_root, second_root);
+        if (Prew < Curr) {
+            step = -step;
+            while (Prew < Curr) {
+                p_xn = xn;
+                Prew = Curr;
+                xn = p_xn + complex<double>(0., step);
+                Curr = Func(xn, number_roots, first_root, second_root);
+                i++;
+                out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+            }
+        }
+        while (Prew > Curr) {
+            p_xn = xn;
+            Prew = Curr;
+            xn = p_xn + complex<double>(0., step);
+            Curr = Func(xn, number_roots, first_root, second_root);
+            i++;
+            out << i << " " << step << " " << xn << " " << Curr << " " << p_xn << " " << Prew << endl;
+        }
+        
+        step /= 2;
+    }
+    
+    out << " /0 ";
+    out << "Root at the point: " << xn << " Func value: " << " " << Curr << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(6);
+    return (p_xn);
+    
+}
+
+
+
+complex<double> PoKordin2(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
     out << "PoKordin"<< number_roots+1 << "\n" << " " << "i" << " " << "(x,y)" << " " << "F(x,y)" << endl;
-    //out << "Passive_Search" << "\n" << " " << "i" << " " << "x" << " " << "y" << endl;
+    
     double Prew = Func(start, number_roots, first_root, second_root);
     out <<i<< " " << start<< " " << Prew << endl;
     complex<double> xn = complex<double>(GR(start, bool(0) ,number_roots, first_root, second_root), start.imag());
@@ -177,7 +247,7 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
         Prew = Curr;
         i++;
         out << i<<" " << xn << " " << Prew << endl;
-        //xn = complex<double>(GR(xn, bool(0), number_roots, first_root, second_root), GR(xn, bool(1), number_roots, first_root, second_root));
+        
         xn = complex<double>(GR(xn, bool(0), number_roots, first_root, second_root), xn.imag());
         xn = complex<double>(xn.real(), GR(xn, bool(1), number_roots, first_root, second_root));
         Curr = Func(xn, number_roots, first_root, second_root);
@@ -190,6 +260,7 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
     DrawTable(3);
     return xn;
 }
+
 
 complex<double> GradWithConst(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
@@ -221,6 +292,78 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
     DrawTable(4);
     return xn;
 }
+
+complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
+    //complex<double>x = complex<double>(A, A);
+    //complex<double>y = complex<double>(B, B);
+    //double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root)) / abs(x - y);
+    //double a = 0.0001*pow(10,number_roots);
+
+    double delta = 0.01;
+    double a = 1 / sqrt(i+1.);
+    out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
+
+    complex<double>xn = start;
+    complex<double>grad = Grad(xn, number_roots, first_root, second_root);
+    while (abs(grad) >= delta) {
+
+        out << i << " " << xn << " " << grad << " " << double(abs(grad)) << " " << endl;
+        
+        xn -= a * grad/ double(abs(grad));
+        grad = Grad(xn, number_roots, first_root, second_root);
+        i++;
+        a = 1 / sqrt(i+1.);
+    }
+    out << i << " " << xn << " " << grad << " " << double(abs(grad)) << endl;
+    out << " /0 ";
+    out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(4);
+    return xn;
+}
+
+complex<double> GradWithCrushingStep(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
+    
+    //complex<double>x = complex<double>(A, A);
+    //complex<double>y = complex<double>(B, B);
+    //double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root)) / abs(x - y);
+    double a = 1, grad_abs, f_prew, f_xn;
+
+    double delta = 0.01;
+   // double a = 1 / sqrt(i + 1.);
+    out << "GradWithCrushingStep" << "\n" << " " << "i" << " " << "a" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << " " << "F(xn)" << endl;
+
+    complex<double>xn = start, prew;
+    complex<double>grad = Grad(xn, number_roots, first_root, second_root);
+    f_xn = Func(xn, number_roots, first_root, second_root);
+    while (abs(grad) >= delta) {
+        grad_abs = double(abs(grad));
+        out << i << " " << a << " " << xn << " " << grad << " " << grad_abs << " " << f_xn << endl;
+        prew = xn;
+        xn -= a * grad / double(abs(grad));
+        grad = Grad(xn, number_roots, first_root, second_root);
+        i++;
+        f_prew = f_xn;
+        f_xn = Func(xn, number_roots, first_root, second_root);
+        if (((f_prew - f_xn) <= -a * 0.9 * pow(grad_abs, 2)));
+        else   a = a * 0.9;
+    }
+    out << i << " " << a << " " << xn << " " << grad << " " << double(abs(grad)) << " " << f_xn << endl;
+    out << " /0 ";
+    out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(6);
+    return xn;
+}
+
 void clear_out(string file) {
     ofstream out(file);
     out.close();
@@ -231,13 +374,22 @@ int main() {
     clear_out("ans.txt");
     clear_out("tmptable.txt");
     complex<double> first_root = PoKordin(complex<double>(0.,0.),0);
-    complex<double> second_root = PoKordin(complex<double>(0., 0.), 1, first_root);
+    complex<double> second_root = PoKordin(first_root, 1, first_root);
     PoKordin(second_root, 2, first_root, second_root);
 
     
     first_root = GradWithConst(complex<double>(12., 12.), 0);
     second_root = GradWithConst(first_root, 1, first_root);
    GradWithConst(second_root, 2, first_root, second_root);
+
+   first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
+   second_root = GradWithKnownStep(first_root, 1, first_root);
+   GradWithKnownStep(second_root, 2, first_root, second_root);
+
+
+   first_root = GradWithCrushingStep(complex<double>(12., 12.), 0);
+   second_root = GradWithCrushingStep(first_root, 1, first_root);
+   GradWithCrushingStep(second_root, 2, first_root, second_root);
 
 
 	return 0;
