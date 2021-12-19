@@ -23,11 +23,11 @@ void DrawTable(int n) {
 
     for (int i = 0; i < n; i++) {
         in >> t;
-        out << setprecision(10) << setw(20) << t << "|";
+        out << setprecision(10) << setw(25) << t << "|";
     }
     out << "\n" << "+";
     for (int i = 0; i < n; i++)
-        out << "--------------------+";
+        out << "-------------------------+";
     out << "\n";
     while (flag) {
         for (int i = 0; i < n; i++) {
@@ -36,7 +36,7 @@ void DrawTable(int n) {
                 flag = 0; break;
             }
 
-            out << "|" << setprecision(10) << setw(20) << t;
+            out << "|" << setprecision(10) << setw(25) << t;
         }
         if (flag)out << "|\n";
         else out << "\n";
@@ -367,31 +367,42 @@ complex<double> GradWithCrushingStep(complex<double> start, int number_roots = 0
 
 complex<double> MNGS(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
+    ofstream out("tmptable.txt", ios_base::app);
     complex<double>xn = start;
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
     double func_prew;
     double func;
+    double F;
     double step = 0.1;
-
+    out << "MNGS" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "alpha" << " " << "F_prew((x,y)-alpha*grad)" << " " << "F((x,y)-alpha*grad)" << " " << "F(x,y)" << endl;
+    double alpha,beta;
     while (abs(grad) >= eps) {
         
-        double alpha = 0.;
+        alpha = 0.;
         func_prew = Func(xn, number_roots, first_root, second_root);
-        
-        double beta = alpha + step;
+        F = func_prew;
+        beta = alpha + step;
         func = Func(xn - beta * grad, number_roots, first_root, second_root);
         while (func_prew > func) {
+            out  << i << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
             func_prew = func;
             alpha = beta;
             beta = alpha + step;
             func = Func(xn - beta * grad, number_roots, first_root, second_root);
+            i++;
         }
         xn = xn - alpha * grad;
+        F = func_prew;
         grad = Grad(xn, number_roots, first_root, second_root);
         step /= 2;
     }
-    cout << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
-    cout << "Func was called " << coun << " times /0 \n";
+    out << i << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
+    out << " /0 ";
+    out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    out << "Func was called " << coun << " times /0 \n";
+    coun = 0;
+    out.close();
+    DrawTable(7);
     return xn;
 }
 
