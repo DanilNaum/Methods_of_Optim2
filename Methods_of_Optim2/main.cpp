@@ -267,17 +267,17 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
     ofstream out("tmptable.txt", ios_base::app);
    complex<double>x = complex<double>(A, A);
     complex<double>y = complex<double>(B, B);
-    double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y);
+    double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y) ;
     double a = 0.0001*pow(10,number_roots);
     
     double delta = 0.01;
-    //double a = min((1 - eps) / (L),0.1);
+    //double a = ((1 - eps) / (L))*2.5;
     
     out << "GradWithConst(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
     complex<double>xn = start;
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
-    while(abs(grad)>= delta){
+    while(abs(grad) >= delta){
         
         out <<i<<" " << xn<<" " << grad <<" " << double(abs(grad)) << endl;
         xn -= a * grad;
@@ -399,16 +399,17 @@ complex<double> MNGS(complex<double> start, int number_roots = 0, complex<double
         }
         xn = xn - alpha * grad;
         F = func_prew;
+        step /= 2;
         if (flag) {
             grad = Grad(xn, number_roots, first_root, second_root);
             alpha = 0;
             step = 0.1;
         }
-        step /= 2;
+        
     }
     out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
     out << " /0 ";
-    out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    out << "Root at the point: " << xn << " grad:" << " " << grad << " Func " << Func(xn) << " /0 ";
     out << "Func was called " << coun << " times /0 \n";
     coun = 0;
     out.close();
@@ -428,24 +429,24 @@ int main() {
     complex<double> first_root = PoKordin(complex<double>(0.,0.),0);
     complex<double> second_root = PoKordin(first_root, 1, first_root);
     PoKordin(second_root, 2, first_root, second_root);
-
+    /*
     
     first_root = GradWithConst(complex<double>(12., 12.), 0);
     second_root = GradWithConst(first_root, 1, first_root);
-   GradWithConst(second_root, 2, first_root, second_root);
+   GradWithConst(second_root, 2, first_root, second_root);*/
 
    first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
    second_root = GradWithKnownStep(first_root, 1, first_root);
    GradWithKnownStep(second_root, 2, first_root, second_root);
+   /*
 
-
-   first_root = GradWithCrushingStep(complex<double>(12., 12.), 0);
+   first_root = GradWithCrushingStep(complex<double>(0., 0.), 0);
    second_root = GradWithCrushingStep(first_root, 1, first_root);
    GradWithCrushingStep(second_root, 2, first_root, second_root);
 
    first_root = MNGS(complex<double>(0., 0.), 0);
    second_root = MNGS(first_root, 1, first_root);
    MNGS(second_root, 2, first_root, second_root);
-
+   */
 	return 0;
 }
