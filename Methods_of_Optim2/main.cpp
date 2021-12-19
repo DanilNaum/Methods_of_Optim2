@@ -376,27 +376,37 @@ complex<double> MNGS(complex<double> start, int number_roots = 0, complex<double
     double step = 0.1;
     out << "MNGS" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "alpha" << " " << "F_prew((x,y)-alpha*grad)" << " " << "F((x,y)-alpha*grad)" << " " << "F(x,y)" << endl;
     double alpha,beta;
+    bool flag = 1;
     while (abs(grad) >= eps) {
         
         alpha = 0.;
-        func_prew = Func(xn, number_roots, first_root, second_root);
+        if (flag)
+            func_prew = Func(xn, number_roots, first_root, second_root);
         F = func_prew;
         beta = alpha + step;
         func = Func(xn - beta * grad, number_roots, first_root, second_root);
+        out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
+        flag = 0;
         while (func_prew > func) {
-            out  << i << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
+            
             func_prew = func;
             alpha = beta;
             beta = alpha + step;
             func = Func(xn - beta * grad, number_roots, first_root, second_root);
-            i++;
+            //i++;
+            flag = 1;
+            out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
         }
         xn = xn - alpha * grad;
         F = func_prew;
-        grad = Grad(xn, number_roots, first_root, second_root);
+        if (flag) {
+            grad = Grad(xn, number_roots, first_root, second_root);
+            alpha = 0;
+            step = 0.1;
+        }
         step /= 2;
     }
-    out << i << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
+    out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
     out << " /0 ";
     out << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
     out << "Func was called " << coun << " times /0 \n";
