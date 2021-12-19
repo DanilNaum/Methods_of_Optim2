@@ -82,6 +82,7 @@ double Func(complex<double> x, int number_roots = 0, complex<double> first_root=
         f = abs(x + E + D - A - B - C);
     return (f);
 }
+
 double DFunc(complex<double> x, bool per1, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     coun++;
 
@@ -119,13 +120,14 @@ double DFunc(complex<double> x, bool per1, int number_roots = 0, complex<double>
         return (f);
     }
 }
+
 complex<double>Grad(complex<double> x, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     complex<double>gr = complex<double>(DFunc(x, bool(0), number_roots, first_root, second_root), DFunc(x, bool(1), number_roots, first_root, second_root));
     return gr;
 }
 
 
-double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+/*double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     double a = A;
     double b = B;
     double sqrt5 = sqrt(5);
@@ -160,6 +162,7 @@ double GR(complex<double> x, bool per1, int number_roots = 0, complex<double> fi
     }
     return((a+b)/2);
 }
+*/
 
 complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
@@ -229,8 +232,7 @@ complex<double> PoKordin(complex<double> start, int number_roots = 0, complex<do
     
 }
 
-
-
+/*
 complex<double> PoKordin2(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
@@ -258,7 +260,7 @@ complex<double> PoKordin2(complex<double> start, int number_roots = 0, complex<d
     DrawTable(3);
     return xn;
 }
-
+*/
 
 complex<double> GradWithConst(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
@@ -363,6 +365,36 @@ complex<double> GradWithCrushingStep(complex<double> start, int number_roots = 0
     return xn;
 }
 
+complex<double> MNGS(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
+    int i = 0;
+    complex<double>xn = start;
+    complex<double>grad = Grad(xn, number_roots, first_root, second_root);
+    double func_prew;
+    double func;
+    double step = 0.1;
+
+    while (abs(grad) >= eps) {
+        
+        double alpha = 0.;
+        func_prew = Func(xn, number_roots, first_root, second_root);
+        
+        double beta = alpha + step;
+        func = Func(xn - beta * grad, number_roots, first_root, second_root);
+        while (func_prew > func) {
+            func_prew = func;
+            alpha = beta;
+            beta = alpha + step;
+            func = Func(xn - beta * grad, number_roots, first_root, second_root);
+        }
+        xn = xn - alpha * grad;
+        grad = Grad(xn, number_roots, first_root, second_root);
+        step /= 2;
+    }
+    cout << "Root at the point: " << xn << " grad:" << " " << grad << "Func " << Func(xn) << " /0 ";
+    cout << "Func was called " << coun << " times /0 \n";
+    return xn;
+}
+
 void clear_out(string file) {
     ofstream out(file);
     out.close();
@@ -390,6 +422,9 @@ int main() {
    second_root = GradWithCrushingStep(first_root, 1, first_root);
    GradWithCrushingStep(second_root, 2, first_root, second_root);
 
+   first_root = MNGS(complex<double>(0., 0.), 0);
+   second_root = MNGS(first_root, 1, first_root);
+   MNGS(second_root, 2, first_root, second_root);
 
 	return 0;
 }
