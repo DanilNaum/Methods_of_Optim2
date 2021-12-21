@@ -4,8 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <complex>
-
-
+#define MOD 0
+double STEP = 1.3;
 double Eps = 1e-5;
 double eps = 1. / 2.;
 using namespace std;
@@ -268,10 +268,10 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
    complex<double>x = complex<double>(A, A);
     complex<double>y = complex<double>(B, B);
     double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y) ;
-    double a = 0.0001*pow(10,number_roots);
+   // double a = 0.00001*pow(10,number_roots);
     
     double delta = 0.01;
-    //double a = ((1 - eps) / (L))*2.5;
+    double a = ((1 - eps) / (L))*2.5;
     
     out << "GradWithConst(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
@@ -303,7 +303,7 @@ complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, c
     //double a = 0.0001*pow(10,number_roots);
 
     double delta = 0.01;
-    double a = 1 / sqrt(i+1.);
+    double a = 1. / (sqrt(i+1.));
     out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
     complex<double>xn = start;
@@ -407,7 +407,7 @@ complex<double> MNGS(complex<double> start, int number_roots = 0, complex<double
         }
         
     }
-    out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
+   // out << i++ << " " << xn << " " << grad << " " << beta << " " << func_prew << " " << func << " " << F << endl;
     out << " /0 ";
     out << "Root at the point: " << xn << " grad:" << " " << grad << " Func " << Func(xn) << " /0 ";
     out << "Func was called " << coun << " times /0 \n";
@@ -426,27 +426,67 @@ void clear_out(string file) {
 int main() {
     clear_out("ans.txt");
     clear_out("tmptable.txt");
-    complex<double> first_root = PoKordin(complex<double>(0.,0.),0);
-    complex<double> second_root = PoKordin(first_root, 1, first_root);
-    PoKordin(second_root, 2, first_root, second_root);
-    /*
-    
-    first_root = GradWithConst(complex<double>(12., 12.), 0);
-    second_root = GradWithConst(first_root, 1, first_root);
-   GradWithConst(second_root, 2, first_root, second_root);*/
+    if (MOD == 1) {
+        complex<double> first_root = PoKordin(complex<double>(0., 0.), 0);
+        complex<double> second_root = PoKordin(first_root, 1, first_root);
+        PoKordin(second_root, 2, first_root, second_root);
 
-   first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
-   second_root = GradWithKnownStep(first_root, 1, first_root);
-   GradWithKnownStep(second_root, 2, first_root, second_root);
-   /*
+        first_root = GradWithConst(complex<double>(0., 0.), 0);
+        second_root = GradWithConst(first_root, 1, first_root);
+        GradWithConst(second_root, 2, first_root, second_root);
 
-   first_root = GradWithCrushingStep(complex<double>(0., 0.), 0);
-   second_root = GradWithCrushingStep(first_root, 1, first_root);
-   GradWithCrushingStep(second_root, 2, first_root, second_root);
+        first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
+        second_root = GradWithKnownStep(first_root, 1, first_root);
+        GradWithKnownStep(second_root, 2, first_root, second_root);
+        
 
-   first_root = MNGS(complex<double>(0., 0.), 0);
-   second_root = MNGS(first_root, 1, first_root);
-   MNGS(second_root, 2, first_root, second_root);
-   */
+        first_root = GradWithCrushingStep(complex<double>(0., 0.), 0);
+        second_root = GradWithCrushingStep(first_root, 1, first_root);
+        GradWithCrushingStep(second_root, 2, first_root, second_root);
+
+        first_root = MNGS(complex<double>(0., 0.), 0);
+        second_root = MNGS(first_root, 1, first_root);
+        MNGS(second_root, 2, first_root, second_root);
+        
+    }
+    else{
+        double x_m, y_m,f,f_m=1e10;
+        for (int x = 0; x < B; x += STEP) {
+            for (int y = 0; y < B; y += STEP) {
+                f = Func(complex<double>(x, y));
+                if (f_m > f) {
+                    f_m = f;
+                    x_m = x;
+                    y_m = y;
+                }
+            } 
+        }
+        ofstream out("ans.txt", ios_base::app);
+        out << "To find a start point Func was caled " << coun << " times"<<endl;
+        coun = 0;
+        out.close();
+        complex<double> start_point = complex<double>(x_m, y_m);
+        complex<double> first_root = PoKordin(start_point, 0);
+        complex<double> second_root = PoKordin(first_root, 1, first_root);
+        PoKordin(second_root, 2, first_root, second_root);
+
+        first_root = GradWithConst(start_point, 0);
+        second_root = GradWithConst(first_root, 1, first_root);
+        GradWithConst(second_root, 2, first_root, second_root);
+
+        first_root = GradWithKnownStep(start_point, 0);
+        second_root = GradWithKnownStep(first_root, 1, first_root);
+        GradWithKnownStep(second_root, 2, first_root, second_root);
+       
+
+        first_root = GradWithCrushingStep(start_point, 0);
+        second_root = GradWithCrushingStep(first_root, 1, first_root);
+        GradWithCrushingStep(second_root, 2, first_root, second_root);
+
+        first_root = MNGS(start_point, 0);
+        second_root = MNGS(first_root, 1, first_root);
+        MNGS(second_root, 2, first_root, second_root);
+        
+    }
 	return 0;
 }
