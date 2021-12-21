@@ -4,8 +4,8 @@
 #include <fstream>
 #include <vector>
 #include <complex>
-#define MOD 0
-double STEP = 1.3;
+#define MOD 1
+double STEP = 4.3;
 double Eps = 1e-5;
 double eps = 1. / 2.;
 using namespace std;
@@ -265,13 +265,15 @@ complex<double> PoKordin2(complex<double> start, int number_roots = 0, complex<d
 complex<double> GradWithConst(complex<double> start, int number_roots = 0, complex<double> first_root = complex<double>(0, 0), complex<double> second_root = complex<double>(0, 0)) {
     int i = 0;
     ofstream out("tmptable.txt", ios_base::app);
-   complex<double>x = complex<double>(A, A);
-    complex<double>y = complex<double>(B, B);
-    double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y) ;
-   // double a = 0.00001*pow(10,number_roots);
+   //complex<double>x = complex<double>(A, A);
+    //complex<double>y = complex<double>(B, B);
+   // double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y) ;
+    double a = 0.0001*pow(10,number_roots);
+   if (MOD && (number_roots!=2 && number_roots != 1))
+        a /= 6.;
     
     double delta = 0.01;
-    double a = ((1 - eps) / (L))*2.5;
+   // double a = ((1 - eps) / (L))*2.5;
     
     out << "GradWithConst(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
@@ -304,7 +306,7 @@ complex<double> GradWithKnownStep(complex<double> start, int number_roots = 0, c
 
     double delta = 0.01;
     double a = 1. / (sqrt(i+1.));
-    out << "GradWithKnownStep(a=" << a << ")" << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
+    out << "GradWithKnownStep"  << "\n" << " " << "i" << " " << "(x,y)" << " " << "Grad(x,y)" << " " << "Abs(Grad(x,y))" << endl;
 
     complex<double>xn = start;
     complex<double>grad = Grad(xn, number_roots, first_root, second_root);
@@ -435,7 +437,7 @@ int main() {
         second_root = GradWithConst(first_root, 1, first_root);
         GradWithConst(second_root, 2, first_root, second_root);
 
-        first_root = GradWithKnownStep(complex<double>(12., 12.), 0);
+        first_root = GradWithKnownStep(complex<double>(0., 0.), 0);
         second_root = GradWithKnownStep(first_root, 1, first_root);
         GradWithKnownStep(second_root, 2, first_root, second_root);
         
@@ -451,8 +453,8 @@ int main() {
     }
     else{
         double x_m, y_m,f,f_m=1e10;
-        for (int x = 0; x < B; x += STEP) {
-            for (int y = 0; y < B; y += STEP) {
+        for (double x = 0; x < B; x += STEP) {
+            for (double y = 0; y < B; y += STEP) {
                 f = Func(complex<double>(x, y));
                 if (f_m > f) {
                     f_m = f;
