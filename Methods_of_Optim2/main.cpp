@@ -268,7 +268,8 @@ complex<double> GradWithConst(complex<double> start, int number_roots = 0, compl
    //complex<double>x = complex<double>(A, A);
     //complex<double>y = complex<double>(B, B);
    // double L = abs(Grad(x, number_roots, first_root, second_root) - Grad(y, number_roots, first_root, second_root))/abs(x-y) ;
-    double a = 0.0001*pow(10,number_roots);
+    double a = 0.0001*pow(100,number_roots);
+    if (number_roots == 2)a /= 10;
    if (MOD && (number_roots!=2 && number_roots != 1))
         a /= 6.;
     
